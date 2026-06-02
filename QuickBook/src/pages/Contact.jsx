@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
+import toast from 'react-hot-toast';
 import { apiPost } from '../services/api';
 
 export const Contact = () => {
@@ -19,21 +21,34 @@ export const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Frontend validations
+    if (!form.firstName.trim() || form.firstName.trim().length < 2) return setError('First name must be at least 2 characters');
+    if (!form.lastName.trim() || form.lastName.trim().length < 2) return setError('Last name must be at least 2 characters');
+    if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) return setError('Valid email is required');
+    if (form.message.trim().length < 10) return setError('Message must be at least 10 characters');
+
     setLoading(true);
 
     try {
-      // Send the message to the backend API
       await apiPost('/contact', getToken, form);
       setSuccess(true);
       setForm({ firstName: '', lastName: '', email: '', message: '' });
+      toast.success('Message sent! We\'ll get back to you soon 📬');
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || 'Could not send message');
     } finally {
       setLoading(false);
     }
   };
 
   return (
+    <>
+    <Helmet>
+      <title>Contact Us — TripQuick</title>
+      <meta name="description" content="Get in touch with TripQuick for tour inquiries, support, or custom travel planning." />
+    </Helmet>
     <div className="min-h-screen bg-gray-50 pt-24 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -198,5 +213,6 @@ export const Contact = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };

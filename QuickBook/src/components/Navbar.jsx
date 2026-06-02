@@ -1,17 +1,22 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router';
-import { Menu, X, Plane, ChevronDown } from 'lucide-react';
+import { Menu, X, Plane, ChevronDown, Heart, LayoutDashboard, User as UserIcon, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserButton } from '@clerk/clerk-react';
+import { UserButton, useUser } from '@clerk/clerk-react';
 import { useTours } from '../context/ToursContext';
+import { useWishlist } from '../context/WishlistContext';
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { tours } = useTours();
+  const { wishlist } = useWishlist();
+  const { user } = useUser();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hoveredDest, setHoveredDest] = useState(false);
+  
+  const isAdmin = user?.publicMetadata?.role === 'admin';
 
   // Use first 4 tours as mega menu destinations
   const featuredDestinations = tours.slice(0, 4);
@@ -114,13 +119,44 @@ export const Navbar = () => {
             ))}
             
             <div className={`pl-4 ml-2 border-l ${isScrolled ? 'border-gray-200' : 'border-white/20'} transition-colors duration-300 flex items-center gap-3`}>
-              {/* Clerk UserButton: shows avatar + sign-out dropdown */}
+              {/* Wishlist Heart Button */}
+              <NavLink
+                to="/wishlist"
+                className="relative p-2 rounded-full transition-colors hover:bg-white/10"
+                title="My Wishlist"
+              >
+                <Heart size={20} className={isScrolled ? 'text-gray-600' : 'text-white'} />
+                {wishlist.length > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {wishlist.length > 9 ? '9+' : wishlist.length}
+                  </span>
+                )}
+              </NavLink>
+
+              {/* Dashboard Link */}
+              <NavLink
+                to="/dashboard"
+                title="My Bookings"
+                className="p-2 rounded-full transition-colors hover:bg-white/10"
+              >
+                <LayoutDashboard size={20} className={isScrolled ? 'text-gray-600' : 'text-white'} />
+              </NavLink>
+
+              {/* Admin Panel Link */}
+              {isAdmin && (
+                <NavLink
+                  to="/admin"
+                  title="Admin Panel"
+                  className="p-2 rounded-full transition-colors hover:bg-white/10"
+                >
+                  <ShieldAlert size={20} className={isScrolled ? 'text-blue-600' : 'text-blue-300'} />
+                </NavLink>
+              )}
+
+              {/* Clerk UserButton */}
               <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: 'w-9 h-9',
-                  },
-                }}
+                appearance={{ elements: { avatarBox: 'w-9 h-9' } }}
+                userProfileUrl="/profile"
               />
               <button onClick={() => navigate('/tours')} className={`px-6 py-2.5 rounded-full font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 ${isScrolled ? 'bg-gray-900 text-white hover:bg-black' : 'bg-white text-gray-900 hover:bg-gray-100'}`}>
                 Plan a Trip
@@ -177,6 +213,34 @@ export const Navbar = () => {
                  <UserButton appearance={{ elements: { avatarBox: 'w-10 h-10' } }} />
                  <span className="text-sm text-gray-600 font-medium">My Account</span>
                </div>
+               <NavLink
+                 to="/dashboard"
+                 onClick={() => setMobileMenuOpen(false)}
+                 className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+               >
+                 <LayoutDashboard size={18} className="text-blue-600" />
+                 <span className="text-sm font-medium text-gray-700">My Bookings</span>
+               </NavLink>
+               
+               {isAdmin && (
+                 <NavLink
+                   to="/admin"
+                   onClick={() => setMobileMenuOpen(false)}
+                   className="flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition-colors"
+                 >
+                   <ShieldAlert size={18} className="text-blue-600" />
+                   <span className="text-sm font-medium text-blue-700">Admin Panel</span>
+                 </NavLink>
+               )}
+
+               <NavLink
+                 to="/wishlist"
+                 onClick={() => setMobileMenuOpen(false)}
+                 className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+               >
+                 <Heart size={18} className="text-red-500 fill-red-500" />
+                 <span className="text-sm font-medium text-gray-700">Wishlist {wishlist.length > 0 && `(${wishlist.length})`}</span>
+               </NavLink>
                <button onClick={() => { setMobileMenuOpen(false); navigate('/tours'); }} className="w-full bg-gray-900 text-white px-6 py-4 rounded-xl font-medium text-lg shadow-xl hover:bg-black transition-colors">
                  Plan Your Journey
                </button>

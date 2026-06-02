@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Users, Target, Award, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { Helmet } from 'react-helmet-async';
 
 export const About = () => {
   const navigate = useNavigate();
@@ -15,6 +16,11 @@ export const About = () => {
   const opacityText = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   return (
+    <>
+    <Helmet>
+      <title>About Us — TripQuick</title>
+      <meta name="description" content="Learn about TripQuick's story, our passionate team, and our commitment to crafting unforgettable travel experiences across India." />
+    </Helmet>
     <div className="bg-transparent font-sans overflow-hidden">
       
       {/* Hero Parallax Section */}
@@ -110,5 +116,6 @@ export const About = () => {
 
       </div>
     </div>
+    </>
   );
 };

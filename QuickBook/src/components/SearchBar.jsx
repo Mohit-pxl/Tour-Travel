@@ -10,8 +10,9 @@ export const SearchBar = () => {
   const [guests, setGuests] = useState('');
 
   const handleSearch = () => {
-    // Navigate to tours page; state is passed so Tours page could use it in the future
-    navigate('/tours', { state: { location, date, guests } });
+    const params = new URLSearchParams();
+    if (location) params.set('search', location);
+    navigate(`/tours?${params.toString()}`);
   };
 
   return (

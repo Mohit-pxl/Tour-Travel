@@ -11,11 +11,14 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.19.0",
+    "@emailjs/browser": "^4.4.1",
     "@tailwindcss/vite": "^4.3.0",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.17.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-helmet-async": "^3.0.0",
+    "react-hot-toast": "^2.6.0",
     "react-router": "^7.16.0",
     "tailwindcss": "^4.3.0"
   },

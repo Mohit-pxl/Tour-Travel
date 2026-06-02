@@ -1,17 +1,26 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'react-router';
+import { Helmet } from 'react-helmet-async';
 import { TourCard } from '../components/TourCard';
 import { useTours } from '../context/ToursContext';
 
 export const Tours = () => {
-  const { tours, loading } = useTours(); // Get tours from shared context
-  const [searchTerm, setSearchTerm] = useState('');
+  const { tours, loading } = useTours();
+  const [searchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '');
   const [typeFilter, setTypeFilter] = useState('All');
   const [priceFilter, setPriceFilter] = useState('All');
   const [ratingFilter, setRatingFilter] = useState('All');
   const [destinationFilter, setDestinationFilter] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
+
+  // Sync searchTerm when URL param changes (e.g. from SearchBar on Home)
+  useEffect(() => {
+    const param = searchParams.get('search');
+    if (param) setSearchTerm(param);
+  }, [searchParams]);
 
 
   const tourTypes = ['All', 'Cultural', 'Relaxation', 'Adventure', 'Wildlife'];
@@ -60,6 +69,11 @@ export const Tours = () => {
   ].filter(Boolean).length;
 
   return (
+    <>
+    <Helmet>
+      <title>Explore Destinations — TripQuick</title>
+      <meta name="description" content="Browse our hand-picked selection of India's most extraordinary tour packages." />
+    </Helmet>
     <div className="min-h-screen bg-transparent pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -250,5 +264,6 @@ export const Tours = () => {
         </main>
       </div>
     </div>
+    </>
   );
 };

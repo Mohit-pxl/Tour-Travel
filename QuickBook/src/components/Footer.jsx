@@ -5,7 +5,7 @@ export const Footer = () => {
   return (
     <footer className="bg-gray-900 text-gray-300 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
           
           {/* Brand & About */}
           <div className="space-y-6">
@@ -13,7 +13,7 @@ export const Footer = () => {
               <div className="bg-blue-600 text-white p-2 rounded-xl">
                 <Plane size={24} />
               </div>
-              <span className="text-2xl font-bold text-white">Dolanan</span>
+              <span className="text-2xl font-bold text-white">TripQuick</span>
             </NavLink>
             <p className="text-sm leading-relaxed">
               Discover the world's most beautiful destinations with our premium travel and tour packages. Your adventure begins here.
@@ -52,38 +52,24 @@ export const Footer = () => {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin size={20} className="text-blue-500 flex-shrink-0" />
-                <span className="text-sm">123 Travel Avenue, Wanderlust City, WL 10012</span>
+                <span className="text-sm">123 Travel Avenue, New Delhi, 110001, India</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={20} className="text-blue-500 flex-shrink-0" />
-                <span className="text-sm">+1 (555) 123-4567</span>
+                <span className="text-sm">+91 98765 43210</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={20} className="text-blue-500 flex-shrink-0" />
-                <span className="text-sm">hello@dolanan.com</span>
+                <span className="text-sm">hello@quickbook.com</span>
               </li>
             </ul>
           </div>
 
-          {/* Newsletter */}
-          <div>
-            <h3 className="text-lg font-bold text-white mb-6">Newsletter</h3>
-            <p className="text-sm mb-4">Subscribe to get the latest offers and travel news.</p>
-            <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
-              <input 
-                type="email" 
-                placeholder="Your email address" 
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
-              />
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-3 transition-colors">
-                Subscribe
-              </button>
-            </form>
-          </div>
+
         </div>
 
         <div className="border-t border-gray-800 mt-12 pt-8 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} Dolanan Travel. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} TripQuick. All rights reserved.</p>
         </div>
       </div>
     </footer>

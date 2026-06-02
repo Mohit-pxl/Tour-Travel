@@ -1,80 +1,83 @@
 // ─────────────────────────────────────────────────────────────────────────────
 //  bookingController.js
-//  Handles booking creation and retrieval. ALL routes require login (Clerk).
+//  Handles booking creation, retrieval, and cancellation.
 // ─────────────────────────────────────────────────────────────────────────────
 
+const { getAuth } = require('@clerk/express');
+const { validationResult } = require('express-validator');
 const Booking = require('../models/Booking');
 const Tour = require('../models/Tour');
-const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/AppError');
-const { getAuth } = require('@clerk/express');
 const logger = require('../config/logger');
 
 // ── POST /api/bookings ────────────────────────────────────────────────────────
-// Creates a new booking for the logged-in user
-const createBooking = catchAsync(async (req, res, next) => {
-  // Get the logged-in user's Clerk ID from the verified token
-  const { userId } = getAuth(req);
-
-  const { tourId, userName, userEmail, guests, date } = req.body;
-
-  // --- Basic validation ---
-  if (!tourId || !userName || !userEmail || !guests || !date) {
-    return next(new AppError('Please provide all required booking details', 400));
+exports.createBooking = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ status: 'error', message: errors.array()[0].msg, errors: errors.array() });
   }
 
-  // --- Check that the tour exists ---
-  const tour = await Tour.findById(tourId);
-  if (!tour) {
-    return next(new AppError('Tour not found', 404));
+  try {
+    const { userId } = getAuth(req);
+    const { tourId, userName, userEmail, guests, date } = req.body;
+
+    const tour = await Tour.findById(tourId);
+    if (!tour) return res.status(404).json({ status: 'error', message: 'Tour not found' });
+
+    const baseTotal  = tour.price * Number(guests);
+    const totalPrice = Math.round(baseTotal * 1.05);
+
+    const booking = await Booking.create({
+      tourId:        tour._id,
+      tourTitle:     tour.title,
+      tourImage:     tour.image,
+      userName,
+      userEmail,
+      guests:        Number(guests),
+      date:          new Date(date),
+      pricePerPerson: tour.price,
+      totalPrice,
+      clerkUserId:   userId,
+      status:        'confirmed',
+    });
+
+    logger.info(`New booking: ${booking._id} | Tour: ${tour.title} | User: ${userId}`);
+
+    res.status(201).json({ status: 'success', message: 'Booking confirmed! 🎉', data: { booking } });
+  } catch (error) {
+    logger.error('Error creating booking: ' + error.message);
+    res.status(500).json({ status: 'error', message: 'Could not create booking' });
   }
-
-  // --- Calculate price ---
-  const serviceFeeRate = 0.05; // 5%
-  const baseTotal = tour.price * guests;
-  const totalPrice = baseTotal + baseTotal * serviceFeeRate;
-
-  // --- Create the booking ---
-  const booking = await Booking.create({
-    tourId: tour._id,
-    tourTitle: tour.title,
-    tourImage: tour.image,
-    userName,
-    userEmail,
-    guests,
-    date: new Date(date),
-    pricePerPerson: tour.price,
-    totalPrice: Math.round(totalPrice),
-    clerkUserId: userId,
-    status: 'confirmed',
-  });
-
-  logger.info(`New booking created`, {
-    bookingId: booking._id,
-    tourTitle: tour.title,
-    userId,
-  });
-
-  res.status(201).json({
-    status: 'success',
-    message: 'Booking confirmed! 🎉',
-    data: { booking },
-  });
-});
+};
 
 // ── GET /api/bookings/mine ────────────────────────────────────────────────────
-// Returns all bookings for the currently logged-in user
-const getMyBookings = catchAsync(async (req, res) => {
-  const { userId } = getAuth(req);
+exports.getMyBookings = async (req, res) => {
+  try {
+    const { userId } = getAuth(req);
+    const bookings = await Booking.find({ clerkUserId: userId }).sort({ createdAt: -1 });
+    res.json({ status: 'success', results: bookings.length, data: { bookings } });
+  } catch (error) {
+    logger.error('Error fetching bookings: ' + error.message);
+    res.status(500).json({ status: 'error', message: 'Could not fetch bookings' });
+  }
+};
 
-  const bookings = await Booking.find({ clerkUserId: userId })
-    .sort({ createdAt: -1 }); // newest first
+// ── PATCH /api/bookings/:id/cancel ────────────────────────────────────────────
+exports.cancelBooking = async (req, res) => {
+  try {
+    const { userId } = getAuth(req);
+    const booking = await Booking.findById(req.params.id);
 
-  res.status(200).json({
-    status: 'success',
-    results: bookings.length,
-    data: { bookings },
-  });
-});
+    if (!booking) return res.status(404).json({ status: 'error', message: 'Booking not found' });
+    if (booking.clerkUserId !== userId) return res.status(403).json({ status: 'error', message: 'Not authorized' });
+    if (booking.status === 'cancelled') return res.status(400).json({ status: 'error', message: 'Already cancelled' });
 
-module.exports = { createBooking, getMyBookings };
+    booking.status = 'cancelled';
+    await booking.save();
+
+    logger.info(`Booking cancelled: ${booking._id} by User: ${userId}`);
+    res.json({ status: 'success', message: 'Booking cancelled successfully', data: { booking } });
+  } catch (error) {
+    logger.error('Error cancelling booking: ' + error.message);
+    res.status(500).json({ status: 'error', message: 'Could not cancel booking' });
+  }
+};

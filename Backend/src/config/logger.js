@@ -43,26 +43,28 @@ const fileFormat = format.combine(
   })
 );
 
-// ── Create the logger ─────────────────────────────────────────────────────────
-const logger = createLogger({
-  level: 'info',  // Log everything at info level and above (info, warn, error)
-  transports: [
-    // 1. Console output (colorful)
-    new transports.Console({ format: consoleFormat }),
+const transportsList = [
+  new transports.Console({ format: consoleFormat })
+];
 
-    // 2. All logs → logs/app.log
+if (process.env.NODE_ENV === 'production') {
+  transportsList.push(
     new transports.File({
       filename: path.join(logsDir, 'app.log'),
       format: fileFormat,
     }),
-
-    // 3. Only errors → logs/error.log
     new transports.File({
       filename: path.join(logsDir, 'error.log'),
       level: 'error',
       format: fileFormat,
-    }),
-  ],
+    })
+  );
+}
+
+// ── Create the logger ─────────────────────────────────────────────────────────
+const logger = createLogger({
+  level: 'info',
+  transports: transportsList,
 });
 
 // ── Morgan stream — lets Morgan HTTP logs go through Winston ──────────────────

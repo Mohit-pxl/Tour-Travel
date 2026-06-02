@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { MapPin, Clock, Star, CheckCircle, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { BookingForm } from '../components/BookingForm';
+import { ReviewsSection } from '../components/ReviewsSection';
 
 /* ─── Small inline image carousel ─── */
 const ImageCarousel = ({ images }) => {
@@ -97,6 +99,11 @@ export const TourDetails = () => {
   }
 
   return (
+    <>
+    <Helmet>
+      <title>{tour.title} — TripQuick</title>
+      <meta name="description" content={tour.description?.slice(0, 150)} />
+    </Helmet>
     <div className="min-h-screen bg-transparent pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -194,6 +201,11 @@ export const TourDetails = () => {
                 ))}
               </div>
             </motion.div>
+
+            {/* Reviews Section */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+              <ReviewsSection tourId={tour._id} />
+            </motion.div>
           </div>
 
           {/* ── Right: Booking Sidebar ── */}
@@ -207,5 +219,6 @@ export const TourDetails = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };

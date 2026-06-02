@@ -30,6 +30,7 @@ export const apiFetch = async (endpoint, getToken, options = {}) => {
   // Merge headers — always send the auth token
   const headers = {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
   };
@@ -64,3 +65,4 @@ export const apiPost = (endpoint, getToken, body) =>
     method: 'POST',
     body: JSON.stringify(body),
   });
+

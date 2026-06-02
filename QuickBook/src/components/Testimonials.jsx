@@ -55,44 +55,35 @@ export const Testimonials = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.8, delay: pos.delay, type: "spring" }}
-                className="md:absolute w-full md:w-[420px]"
-                style={{ 
-                  // Only apply absolute positioning styles on md and above. For mobile, it will just flow normally.
-                  // We'll use a trick with CSS variables or just rely on Tailwind classes where possible.
-                  // But inline styles are hard to make responsive without media queries in JS.
-                  // Let's just use CSS for the absolute positioning.
-                }}
-              >
-                {/* For actual implementation of responsive inline styles, we'll use a wrapper that changes from relative to absolute */}
-                <div className={`
-                  md:absolute w-full
+                className={`
+                  w-full md:absolute md:w-[420px]
                   ${index === 0 ? 'md:top-0 md:left-0' : ''}
                   ${index === 1 ? 'md:top-[15%] md:right-0' : ''}
                   ${index === 2 ? 'md:bottom-[15%] md:left-[10%]' : ''}
                   ${index === 3 ? 'md:bottom-0 md:right-[10%]' : ''}
-                `}>
-                  <motion.div 
-                    animate={{ y: pos.y }}
-                    transition={{ repeat: Infinity, duration: 4 + index, ease: "easeInOut", delay: pos.delay }}
-                    className="bg-white/80 backdrop-blur-xl p-8 md:p-10 rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-gray-100 relative group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
-                  >
-                    <Quote size={48} className="text-blue-50 absolute top-8 right-8 transform group-hover:rotate-12 transition-transform duration-500 z-0" />
-                    
-                    <p className="text-gray-700 text-lg md:text-xl leading-relaxed mb-8 relative z-10 font-medium">
-                      "{testimonial.content}"
-                    </p>
-                    
-                    <div className="flex items-center gap-4 relative z-10">
-                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white shadow-md">
-                        <img src={testimonial.avatar} alt={testimonial.name} className="w-full h-full object-cover" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-900 font-serif text-lg">{testimonial.name}</h4>
-                        <p className="text-sm text-blue-600 font-medium">{testimonial.role}</p>
-                      </div>
+                `}
+              >
+                <motion.div 
+                  animate={{ y: pos.y }}
+                  transition={{ repeat: Infinity, duration: 4 + index, ease: "easeInOut", delay: pos.delay }}
+                  className="bg-white/80 backdrop-blur-xl p-8 md:p-10 rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-gray-100 relative group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
+                >
+                  <Quote size={48} className="text-blue-50 absolute top-8 right-8 transform group-hover:rotate-12 transition-transform duration-500 z-0" />
+                  
+                  <p className="text-gray-700 text-lg md:text-xl leading-relaxed mb-8 relative z-10 font-medium">
+                    "{testimonial.content}"
+                  </p>
+                  
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white shadow-md">
+                      <img src={testimonial.avatar} alt={testimonial.name} className="w-full h-full object-cover" />
                     </div>
-                  </motion.div>
-                </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 font-serif text-lg">{testimonial.name}</h4>
+                      <p className="text-sm text-blue-600 font-medium">{testimonial.role}</p>
+                    </div>
+                  </div>
+                </motion.div>
               </motion.div>
             );
           })}
