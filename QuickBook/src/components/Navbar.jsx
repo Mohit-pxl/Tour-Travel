@@ -47,7 +47,7 @@ export const Navbar = () => {
             <div className="bg-blue-600 text-white p-2.5 rounded-xl group-hover:bg-blue-700 transition-colors shadow-lg">
               <Plane size={24} />
             </div>
-            <span className={`text-2xl font-bold font-serif ${isScrolled ? 'text-gray-900' : 'text-white'} transition-colors duration-300`}>
+            <span className="text-2xl font-bold font-serif text-black transition-colors duration-300">
               TripQuick
             </span>
           </NavLink>
@@ -65,7 +65,7 @@ export const Navbar = () => {
                   to={link.path}
                   className={({ isActive }) => 
                     `relative z-10 flex items-center gap-1 text-sm font-medium transition-colors duration-300 ${
-                      isActive ? (isScrolled ? 'text-blue-600' : 'text-blue-400') : (isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-gray-200 hover:text-white')
+                      isActive ? 'text-blue-600' : 'text-black hover:text-gray-700'
                     }`
                   }
                 >
@@ -76,7 +76,7 @@ export const Navbar = () => {
                 {location.pathname === link.path && (
                   <motion.div
                     layoutId="activeNav"
-                    className={`absolute inset-0 rounded-full z-0 ${isScrolled ? 'bg-gray-100' : 'bg-white/10'}`}
+                    className="absolute inset-0 rounded-full z-0 bg-gray-100"
                     initial={false}
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
@@ -118,14 +118,14 @@ export const Navbar = () => {
               </div>
             ))}
             
-            <div className={`pl-4 ml-2 border-l ${isScrolled ? 'border-gray-200' : 'border-white/20'} transition-colors duration-300 flex items-center gap-3`}>
+            <div className={`pl-4 ml-2 border-l ${isScrolled ? 'border-gray-200' : 'border-gray-300'} transition-colors duration-300 flex items-center gap-3`}>
               {/* Wishlist Heart Button */}
               <NavLink
                 to="/wishlist"
-                className="relative p-2 rounded-full transition-colors hover:bg-white/10"
+                className="relative p-2 rounded-full transition-colors hover:bg-gray-100"
                 title="My Wishlist"
               >
-                <Heart size={20} className={isScrolled ? 'text-gray-600' : 'text-white'} />
+                <Heart size={20} className="text-black" />
                 {wishlist.length > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                     {wishlist.length > 9 ? '9+' : wishlist.length}
@@ -137,9 +137,9 @@ export const Navbar = () => {
               <NavLink
                 to="/dashboard"
                 title="My Bookings"
-                className="p-2 rounded-full transition-colors hover:bg-white/10"
+                className="p-2 rounded-full transition-colors hover:bg-gray-100"
               >
-                <LayoutDashboard size={20} className={isScrolled ? 'text-gray-600' : 'text-white'} />
+                <LayoutDashboard size={20} className="text-black" />
               </NavLink>
 
               {/* Admin Panel Link */}
@@ -147,9 +147,9 @@ export const Navbar = () => {
                 <NavLink
                   to="/admin"
                   title="Admin Panel"
-                  className="p-2 rounded-full transition-colors hover:bg-white/10"
+                  className="p-2 rounded-full transition-colors hover:bg-gray-100"
                 >
-                  <ShieldAlert size={20} className={isScrolled ? 'text-blue-600' : 'text-blue-300'} />
+                  <ShieldAlert size={20} className="text-blue-600" />
                 </NavLink>
               )}
 
@@ -158,7 +158,7 @@ export const Navbar = () => {
                 appearance={{ elements: { avatarBox: 'w-9 h-9' } }}
                 userProfileUrl="/profile"
               />
-              <button onClick={() => navigate('/tours')} className={`px-6 py-2.5 rounded-full font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 ${isScrolled ? 'bg-gray-900 text-white hover:bg-black' : 'bg-white text-gray-900 hover:bg-gray-100'}`}>
+              <button onClick={() => navigate('/tours')} className="px-6 py-2.5 rounded-full font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 bg-black text-white hover:bg-gray-900">
                 Plan a Trip
               </button>
             </div>
@@ -168,7 +168,7 @@ export const Navbar = () => {
           <div className="md:hidden z-50 relative">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`p-2 rounded-full backdrop-blur-md transition-colors ${isScrolled ? 'text-gray-900 bg-gray-100' : 'text-white bg-white/10'}`}
+              className="p-2 rounded-full backdrop-blur-md transition-colors text-black bg-gray-100"
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -241,7 +241,7 @@ export const Navbar = () => {
                  <Heart size={18} className="text-red-500 fill-red-500" />
                  <span className="text-sm font-medium text-gray-700">Wishlist {wishlist.length > 0 && `(${wishlist.length})`}</span>
                </NavLink>
-               <button onClick={() => { setMobileMenuOpen(false); navigate('/tours'); }} className="w-full bg-gray-900 text-white px-6 py-4 rounded-xl font-medium text-lg shadow-xl hover:bg-black transition-colors">
+               <button onClick={() => { setMobileMenuOpen(false); navigate('/tours'); }} className="w-full bg-black text-white px-6 py-4 rounded-xl font-medium text-lg shadow-xl hover:bg-gray-900 transition-colors">
                  Plan Your Journey
                </button>
             </div>

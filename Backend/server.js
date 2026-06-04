@@ -11,6 +11,7 @@ const helmet       = require('helmet');
 const morgan       = require('morgan');
 const rateLimit    = require('express-rate-limit');
 const { clerkMiddleware } = require('@clerk/express');
+const path         = require('path');
 
 const connectDB       = require('./src/config/db');
 const logger          = require('./src/config/logger');
@@ -19,6 +20,7 @@ const bookingRoutes   = require('./src/routes/bookingRoutes');
 const contactRoutes   = require('./src/routes/contactRoutes');
 const reviewRoutes    = require('./src/routes/reviewRoutes');
 const adminRoutes     = require('./src/routes/adminRoutes');
+const settingRoutes   = require('./src/routes/settingRoutes');
 
 // ── Create Express app ────────────────────────────────────────────────────────
 const app = express();
@@ -56,6 +58,9 @@ app.use(morgan('dev'));
 app.use(clerkMiddleware());
 app.use('/api/', limiter); // Apply rate limit to all API routes
 
+// Serve static uploads folder
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running! 🚀', env: process.env.NODE_ENV });
@@ -66,6 +71,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/contact',  contactRoutes);
 app.use('/api/reviews',  reviewRoutes);
 app.use('/api/admin',    adminRoutes);
+app.use('/api/settings', settingRoutes);
 
 // ── 404 Handler ───────────────────────────────────────────────────────────────
 app.use((req, res) => {
