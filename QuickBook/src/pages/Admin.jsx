@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Package, BookOpen, Plus, Edit2, Trash2,
   Loader2, X, CheckCircle2, XCircle, AlertCircle, TrendingUp,
-  Users, IndianRupee, Star
+  Users, IndianRupee, Star, Settings
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
@@ -13,6 +13,9 @@ import { apiFetch, apiGet } from '../services/api';
 const TOUR_TYPES = ['Cultural', 'Relaxation', 'Adventure', 'Wildlife'];
 
 const TourFormModal = ({ tour, onClose, onSave }) => {
+  const { getToken } = useAuth();
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(tour?.image || '');
   const [form, setForm] = useState({
     title: tour?.title || '',
     location: tour?.location || '',
@@ -32,14 +35,31 @@ const TourFormModal = ({ tour, onClose, onSave }) => {
     e.preventDefault();
     setSaving(true);
     try {
+      let imageUrl = form.image;
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('image', selectedFile);
+        const uploadRes = await apiFetch('/admin/upload', getToken, {
+          method: 'POST',
+          body: formData,
+        });
+        imageUrl = uploadRes.data.url;
+      } else if (!imageUrl) {
+        toast.error('Please select an image');
+        return;
+      }
+
       await onSave({
         ...form,
+        image: imageUrl,
         price: Number(form.price),
         rating: Number(form.rating),
         reviews: Number(form.reviews),
         facilities: form.facilities.split(',').map(f => f.trim()).filter(Boolean),
-        images: [form.image],
+        images: [imageUrl],
       });
+    } catch (err) {
+      toast.error(err.message || 'Upload failed');
     } finally {
       setSaving(false);
     }
@@ -81,9 +101,15 @@ const TourFormModal = ({ tour, onClose, onSave }) => {
             {field('Tour Title', 'title', 'text', 'e.g. Goa Beach Escape')}
             {field('Location', 'location', 'text', 'e.g. Goa, India')}
             {field('Duration', 'duration', 'text', 'e.g. 5 Days / 4 Nights')}
-            {field('Price (₹ per person)', 'price', 'number', '15000')}
-            {field('Rating', 'rating', 'number', '4.5')}
-            {field('Number of Reviews', 'reviews', 'number', '0')}
+            <div className="col-span-2 grid grid-cols-2 gap-4">
+              {field('Price (₹ per person)', 'price', 'number', '15000')}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Rating & Reviews</label>
+                <div className="w-full px-3 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-gray-500 text-sm">
+                  {form.rating} ⭐ ({form.reviews} reviews) - Auto-calculated
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>
@@ -97,7 +123,25 @@ const TourFormModal = ({ tour, onClose, onSave }) => {
             </select>
           </div>
 
-          {field('Image URL', 'image', 'url', 'https://images.unsplash.com/...')}
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Tour Image</label>
+            <div className="flex items-center gap-4">
+              {previewUrl && (
+                <img src={previewUrl} alt="Preview" className="w-16 h-16 rounded-xl object-cover border border-gray-200" />
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => {
+                  if (e.target.files[0]) {
+                    setSelectedFile(e.target.files[0]);
+                    setPreviewUrl(URL.createObjectURL(e.target.files[0]));
+                  }
+                }}
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all"
+              />
+            </div>
+          </div>
 
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Description</label>
@@ -159,18 +203,23 @@ export const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [editingTour, setEditingTour] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [heroImageFile, setHeroImageFile] = useState(null);
+  const [heroImagePreview, setHeroImagePreview] = useState('');
+  const [savingSettings, setSavingSettings] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [statsRes, toursRes, bookingsRes] = await Promise.all([
+      const [statsRes, toursRes, bookingsRes, heroRes] = await Promise.all([
         apiFetch('/admin/stats', getToken),
         apiFetch('/admin/tours', getToken),
         apiFetch('/admin/bookings', getToken),
+        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000/api'}/settings/heroImage`).then(res => res.ok ? res.json() : null),
       ]);
       setStats(statsRes.data);
       setTours(toursRes.data.tours);
       setBookings(bookingsRes.data.bookings);
+      if (heroRes?.data?.value) setHeroImagePreview(heroRes.data.value);
     } catch (err) {
       toast.error('Failed to load admin data: ' + err.message);
     } finally {
@@ -219,6 +268,34 @@ export const Admin = () => {
     }
   };
 
+  const handleSaveSettings = async () => {
+    if (!heroImageFile) return toast.error('Please select an image first');
+    setSavingSettings(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', heroImageFile);
+      
+      const uploadRes = await apiFetch('/admin/upload', getToken, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const imageUrl = uploadRes.data.url;
+      
+      await apiFetch('/admin/settings/heroImage', getToken, {
+        method: 'PUT',
+        body: JSON.stringify({ value: imageUrl })
+      });
+      
+      toast.success('Hero image updated successfully!');
+      setHeroImageFile(null);
+    } catch (err) {
+      toast.error(err.message || 'Failed to save settings');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   const statusColor = {
     confirmed: 'bg-green-100 text-green-700',
     pending:   'bg-yellow-100 text-yellow-700',
@@ -229,6 +306,7 @@ export const Admin = () => {
     { id: 'stats',    label: 'Dashboard',  icon: LayoutDashboard },
     { id: 'tours',    label: 'Tours',       icon: Package },
     { id: 'bookings', label: 'Bookings',    icon: BookOpen },
+    { id: 'settings', label: 'Settings',    icon: Settings },
   ];
 
   return (
@@ -418,6 +496,53 @@ export const Admin = () => {
                           ))}
                         </tbody>
                       </table>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ── SETTINGS TAB ── */}
+              {tab === 'settings' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl">
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-6">Website Settings</h3>
+                    
+                    <div className="space-y-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Hero Section Background Image</label>
+                        <p className="text-xs text-gray-500 mb-4">Upload a high-quality image (ideally landscape, min 1920x1080) for the main homepage banner.</p>
+                        
+                        {heroImagePreview && (
+                          <div className="mb-4 rounded-xl overflow-hidden border border-gray-200 aspect-video relative">
+                            <img src={heroImagePreview} alt="Hero Preview" className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-4">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={e => {
+                              if (e.target.files[0]) {
+                                setHeroImageFile(e.target.files[0]);
+                                setHeroImagePreview(URL.createObjectURL(e.target.files[0]));
+                              }
+                            }}
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="pt-6 border-t border-gray-100">
+                        <button
+                          onClick={handleSaveSettings}
+                          disabled={savingSettings || !heroImageFile}
+                          className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {savingSettings && <Loader2 size={16} className="animate-spin" />}
+                          Save Changes
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

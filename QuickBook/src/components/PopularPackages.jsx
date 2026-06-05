@@ -20,15 +20,16 @@ const StackedCard = ({ tour, index }) => {
       ref={cardRef}
       className="sticky flex flex-col justify-center w-full"
       style={{ 
-        top: `calc(10vh + ${index * 40}px)`,
-        height: '60vh',
-        marginBottom: '40vh',
+        top: `calc(10vh + calc(${index} * min(40px, 5vw)))`,
+        height: '65vh',
+        minHeight: '420px',
+        marginBottom: index === 3 ? '10vh' : '40vh',
         zIndex: index
       }}
     >
       <motion.div 
         style={{ scale }}
-        className="w-full h-full relative rounded-[3rem] overflow-hidden shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.5)] group cursor-pointer border border-white/10"
+        className="w-full h-full relative rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.5)] group cursor-pointer border border-white/10"
         onClick={() => navigate(`/tours/${tour._id}`)}
       >
         <div className="absolute inset-0">
@@ -38,37 +39,37 @@ const StackedCard = ({ tour, index }) => {
              className="w-full h-full object-cover transform scale-110 group-hover:scale-100 transition-transform duration-1000 ease-[0.2,0.65,0.3,0.9]" 
            />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 lg:group-hover:opacity-80 transition-opacity duration-500" />
         
-        <div className="absolute inset-0 p-6 md:p-10 flex flex-col justify-end">
-          <div className="transform translate-y-8 group-hover:translate-y-0 transition-transform duration-700 ease-out">
-            <div className="flex flex-wrap items-center gap-4 mb-8 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">
-               <span className="bg-white/20 backdrop-blur-md px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase border border-white/30 text-white">
+        <div className="absolute inset-0 p-5 md:p-10 flex flex-col justify-end">
+          <div className="transform translate-y-0 lg:translate-y-8 lg:group-hover:translate-y-0 transition-transform duration-700 ease-out">
+            <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4 md:mb-8 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-700 delay-100">
+               <span className="bg-white/20 backdrop-blur-md px-3 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-semibold tracking-wider uppercase border border-white/30 text-white">
                  {tour.tourType}
                </span>
-               <span className="flex items-center gap-2 text-sm text-gray-200 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">
-                 <Clock size={16} /> {tour.duration}
+               <span className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-gray-200 bg-black/40 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-white/10">
+                 <Clock size={14} className="md:w-4 md:h-4" /> {tour.duration}
                </span>
-               <span className="flex items-center gap-2 text-sm text-gray-200 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">
-                 <Star size={16} className="text-yellow-400 fill-current" /> {tour.rating}
+               <span className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-gray-200 bg-black/40 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-white/10">
+                 <Star size={14} className="text-yellow-400 fill-current md:w-4 md:h-4" /> {tour.rating}
                </span>
             </div>
             
-            <h3 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white mb-6 leading-none tracking-tight">{tour.title}</h3>
+            <h3 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-white mb-3 md:mb-6 leading-none tracking-tight">{tour.title}</h3>
             
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-t border-white/20 pt-8 mt-8">
-              <p className="text-lg text-gray-300 max-w-xl font-light leading-relaxed">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 md:gap-8 border-t border-white/20 pt-4 mt-4 md:pt-8 md:mt-8">
+              <p className="text-sm md:text-lg text-gray-300 max-w-xl font-light leading-relaxed line-clamp-2 md:line-clamp-none">
                 {tour.description}
               </p>
               
-              <div className="flex items-center gap-8 shrink-0">
-                <div className="text-white text-right">
-                  <span className="block text-sm text-gray-400 uppercase tracking-widest mb-1">Starting From</span>
-                  <span className="text-4xl font-bold font-serif">₹{tour.price.toLocaleString()}</span>
+              <div className="flex items-center justify-between sm:justify-end gap-4 md:gap-8 shrink-0 w-full sm:w-auto">
+                <div className="text-white text-left sm:text-right">
+                  <span className="block text-[10px] md:text-sm text-gray-400 uppercase tracking-widest mb-1">Starting From</span>
+                  <span className="text-2xl md:text-4xl font-bold font-serif">₹{tour.price.toLocaleString()}</span>
                 </div>
                 
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-gray-900 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-xl group-hover:rotate-[-45deg]">
-                  <ArrowRight size={24} />
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-full flex items-center justify-center text-gray-900 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-xl group-hover:rotate-[-45deg]">
+                  <ArrowRight size={20} className="md:w-6 md:h-6" />
                 </div>
               </div>
             </div>

@@ -18,8 +18,6 @@ const tourData = [
     location: 'Goa, India',
     duration: '5 Days',
     tourType: 'Relaxation',
-    rating: 4.8,
-    reviews: 124,
     price: 15000,
     image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=800&auto=format&fit=crop',
     images: [
@@ -36,8 +34,6 @@ const tourData = [
     location: 'Rajasthan, India',
     duration: '7 Days',
     tourType: 'Cultural',
-    rating: 4.9,
-    reviews: 342,
     price: 25000,
     image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?q=80&w=800&auto=format&fit=crop',
     images: [
@@ -54,8 +50,6 @@ const tourData = [
     location: 'Kerala, India',
     duration: '4 Days',
     tourType: 'Relaxation',
-    rating: 4.7,
-    reviews: 89,
     price: 18000,
     image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80&w=800&auto=format&fit=crop',
     images: [
@@ -72,8 +66,6 @@ const tourData = [
     location: 'Himachal Pradesh, India',
     duration: '8 Days',
     tourType: 'Adventure',
-    rating: 4.9,
-    reviews: 210,
     price: 12000,
     image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=800&auto=format&fit=crop',
     images: [
@@ -90,8 +82,6 @@ const tourData = [
     location: 'Delhi, Agra, Jaipur, India',
     duration: '6 Days',
     tourType: 'Cultural',
-    rating: 5.0,
-    reviews: 85,
     price: 22000,
     image: 'https://images.unsplash.com/photo-1564507592208-027f1cce86c4?q=80&w=800&auto=format&fit=crop',
     images: [

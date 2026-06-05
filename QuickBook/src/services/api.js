@@ -27,13 +27,20 @@ export const apiFetch = async (endpoint, getToken, options = {}) => {
   // Build the full URL
   const url = `${API_URL}${endpoint}`;
 
-  // Merge headers — always send the auth token
   const headers = {
-    'Content-Type': 'application/json',
     'Accept': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
   };
+
+  if (!(options.body instanceof FormData)) {
+    if (!headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+  } else {
+    // Let the browser set the Content-Type automatically for FormData to include the boundary
+    delete headers['Content-Type'];
+  }
 
   const response = await fetch(url, {
     ...options,

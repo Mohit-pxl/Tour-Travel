@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router';
+import { Routes, Route, Outlet } from 'react-router';
 import { SignedIn, SignedOut, RedirectToSignIn, SignIn, SignUp } from '@clerk/clerk-react';
 import { Helmet } from 'react-helmet-async';
 import { Navbar } from './components/Navbar';
@@ -59,24 +59,12 @@ function App() {
 
           {/* ── Protected App Routes ─────────────────────────────────────── */}
           <Route
-            path="/*"
             element={
               <>
                 <SignedIn>
                   <Navbar />
                   <div className="flex-1 relative z-10">
-                    <Routes>
-                      <Route path="/"            element={<Home />} />
-                      <Route path="/tours"        element={<Tours />} />
-                      <Route path="/tours/:id"    element={<TourDetails />} />
-                      <Route path="/about"        element={<About />} />
-                      <Route path="/contact"      element={<Contact />} />
-                      <Route path="/dashboard"    element={<Dashboard />} />
-                      <Route path="/wishlist"     element={<Wishlist />} />
-                      <Route path="/profile"      element={<Profile />} />
-                      <Route path="/admin"        element={<Admin />} />
-                      <Route path="*"             element={<NotFound />} />
-                    </Routes>
+                    <Outlet />
                   </div>
                   <Footer />
                 </SignedIn>
@@ -86,7 +74,18 @@ function App() {
                 </SignedOut>
               </>
             }
-          />
+          >
+            <Route path="/"            element={<Home />} />
+            <Route path="/tours"        element={<Tours />} />
+            <Route path="/tours/:id"    element={<TourDetails />} />
+            <Route path="/about"        element={<About />} />
+            <Route path="/contact"      element={<Contact />} />
+            <Route path="/dashboard"    element={<Dashboard />} />
+            <Route path="/wishlist"     element={<Wishlist />} />
+            <Route path="/profile"      element={<Profile />} />
+            <Route path="/admin"        element={<Admin />} />
+            <Route path="*"             element={<NotFound />} />
+          </Route>
         </Routes>
       </div>
     </WishlistProvider>

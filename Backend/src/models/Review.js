@@ -47,4 +47,39 @@ const reviewSchema = new mongoose.Schema(
 // One review per user per tour
 reviewSchema.index({ tourId: 1, clerkUserId: 1 }, { unique: true });
 
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
+  const stats = await this.aggregate([
+    {
+      $match: { tourId: tourId }
+    },
+    {
+      $group: {
+        _id: '$tourId',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' }
+      }
+    }
+  ]);
+
+  if (stats.length > 0) {
+    await mongoose.model('Tour').findByIdAndUpdate(tourId, {
+      reviews: stats[0].nRating,
+      rating: Math.round(stats[0].avgRating * 10) / 10
+    });
+  } else {
+    await mongoose.model('Tour').findByIdAndUpdate(tourId, {
+      reviews: 0,
+      rating: 0
+    });
+  }
+};
+
+reviewSchema.post('save', function () {
+  this.constructor.calcAverageRatings(this.tourId);
+});
+
+reviewSchema.post('deleteOne', { document: true, query: false }, function () {
+  this.constructor.calcAverageRatings(this.tourId);
+});
+
 module.exports = mongoose.model('Review', reviewSchema);

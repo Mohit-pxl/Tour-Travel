@@ -50,44 +50,44 @@ const BookingCard = ({ booking, onCancel }) => {
     >
       <div className="flex flex-col sm:flex-row">
         {/* Tour Image */}
-        <div className="sm:w-52 h-40 sm:h-auto flex-shrink-0 relative">
+        <div className="w-full sm:w-52 h-48 sm:h-auto flex-shrink-0 relative overflow-hidden bg-gray-100">
           <img
             src={booking.tourImage || 'https://images.unsplash.com/photo-1469521669194-babb45599def?w=400'}
             alt={booking.tourTitle}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent sm:bg-gradient-to-r" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent sm:bg-gradient-to-r pointer-events-none" />
         </div>
 
         {/* Booking Info */}
-        <div className="flex-1 p-5">
+        <div className="flex-1 p-4 sm:p-5 min-w-0">
           <div className="flex justify-between items-start flex-wrap gap-2">
-            <div>
-              <h3 className="text-base font-bold text-gray-900 mb-1">{booking.tourTitle}</h3>
-              <p className="text-xs text-gray-400">Booking ID: #{String(booking._id).slice(-8).toUpperCase()}</p>
+            <div className="min-w-0 flex-1 pr-2">
+              <h3 className="text-base font-bold text-gray-900 mb-1 break-words">{booking.tourTitle}</h3>
+              <p className="text-xs text-gray-400 truncate">Booking ID: #{String(booking._id).slice(-8).toUpperCase()}</p>
             </div>
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${status.color}`}>
-              <StatusIcon size={13} /> {status.label}
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold border whitespace-nowrap shrink-0 ${status.color}`}>
+              <StatusIcon size={12} className="sm:w-[13px] sm:h-[13px]" /> {status.label}
             </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-gray-600 truncate">
               <Calendar size={15} className="text-blue-500 flex-shrink-0" />
-              <span>{travelDate}</span>
+              <span className="truncate">{travelDate}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-gray-600 truncate">
               <Users size={15} className="text-blue-500 flex-shrink-0" />
-              <span>{booking.guests} Guest{booking.guests > 1 ? 's' : ''}</span>
+              <span className="truncate">{booking.guests} Guest{booking.guests > 1 ? 's' : ''}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-              <span>₹{booking.totalPrice?.toLocaleString('en-IN')}</span>
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 truncate col-span-2 sm:col-span-1">
+              <span className="truncate">₹{booking.totalPrice?.toLocaleString('en-IN')}</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-            <p className="text-xs text-gray-400">Booked on {bookedOn}</p>
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col items-start sm:items-center sm:flex-row justify-between mt-4 pt-3 border-t border-gray-100 gap-3 sm:gap-0">
+            <p className="text-[10px] sm:text-xs text-gray-400">Booked on {bookedOn}</p>
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
               {booking.status === 'confirmed' && (
                 <button
                   onClick={handleCancel}
@@ -100,10 +100,10 @@ const BookingCard = ({ booking, onCancel }) => {
               )}
               <button
                 onClick={() => setExpanded(e => !e)}
-                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors bg-blue-50 px-3 py-1.5 rounded-lg ml-auto"
               >
-                {expanded ? 'Less' : 'Details'}
-                {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                {expanded ? 'Hide' : 'Details'}
+                {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </button>
             </div>
           </div>
@@ -118,20 +118,20 @@ const BookingCard = ({ booking, onCancel }) => {
               >
                 <div className="mt-4 pt-4 border-t border-dashed border-gray-200 grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-gray-400 text-xs mb-1">Price per person</p>
-                    <p className="font-semibold">₹{booking.pricePerPerson?.toLocaleString('en-IN')}</p>
+                    <p className="text-gray-400 text-[10px] sm:text-xs mb-0.5">Price per person</p>
+                    <p className="font-semibold truncate">₹{booking.pricePerPerson?.toLocaleString('en-IN')}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs mb-1">Service fee (5%)</p>
-                    <p className="font-semibold">₹{Math.round(booking.pricePerPerson * booking.guests * 0.05).toLocaleString('en-IN')}</p>
+                    <p className="text-gray-400 text-[10px] sm:text-xs mb-0.5">Service fee (5%)</p>
+                    <p className="font-semibold truncate">₹{Math.round(booking.pricePerPerson * booking.guests * 0.05).toLocaleString('en-IN')}</p>
                   </div>
-                  <div>
-                    <p className="text-gray-400 text-xs mb-1">Guest name</p>
-                    <p className="font-semibold">{booking.userName}</p>
+                  <div className="col-span-2 sm:col-span-1">
+                    <p className="text-gray-400 text-[10px] sm:text-xs mb-0.5">Guest name</p>
+                    <p className="font-semibold truncate">{booking.userName}</p>
                   </div>
-                  <div>
-                    <p className="text-gray-400 text-xs mb-1">Contact email</p>
-                    <p className="font-semibold truncate">{booking.userEmail}</p>
+                  <div className="col-span-2 sm:col-span-1">
+                    <p className="text-gray-400 text-[10px] sm:text-xs mb-0.5">Contact email</p>
+                    <p className="font-semibold truncate" title={booking.userEmail}>{booking.userEmail}</p>
                   </div>
                 </div>
               </motion.div>
