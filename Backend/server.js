@@ -21,6 +21,7 @@ const contactRoutes   = require('./src/routes/contactRoutes');
 const reviewRoutes    = require('./src/routes/reviewRoutes');
 const adminRoutes     = require('./src/routes/adminRoutes');
 const settingRoutes   = require('./src/routes/settingRoutes');
+const wishlistRoutes  = require('./src/routes/wishlistRoutes');
 
 // ── Create Express app ────────────────────────────────────────────────────────
 const app = express();
@@ -72,6 +73,7 @@ app.use('/api/contact',  contactRoutes);
 app.use('/api/reviews',  reviewRoutes);
 app.use('/api/admin',    adminRoutes);
 app.use('/api/settings', settingRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // ── 404 Handler ───────────────────────────────────────────────────────────────
 app.use((req, res) => {

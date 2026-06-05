@@ -101,9 +101,15 @@ const TourFormModal = ({ tour, onClose, onSave }) => {
             {field('Tour Title', 'title', 'text', 'e.g. Goa Beach Escape')}
             {field('Location', 'location', 'text', 'e.g. Goa, India')}
             {field('Duration', 'duration', 'text', 'e.g. 5 Days / 4 Nights')}
-            {field('Price (₹ per person)', 'price', 'number', '15000')}
-            {field('Rating', 'rating', 'number', '4.5')}
-            {field('Number of Reviews', 'reviews', 'number', '0')}
+            <div className="col-span-2 grid grid-cols-2 gap-4">
+              {field('Price (₹ per person)', 'price', 'number', '15000')}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Rating & Reviews</label>
+                <div className="w-full px-3 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-gray-500 text-sm">
+                  {form.rating} ⭐ ({form.reviews} reviews) - Auto-calculated
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>
