@@ -42,6 +42,7 @@ router.post('/tours', validateTourPost, adminController.createTour);
 router.put('/tours/:id', validateTourPatch, adminController.updateTour);
 router.delete('/tours/:id', adminController.deleteTour);
 router.get('/bookings', adminController.getAllBookings);
+router.get('/contacts', adminController.getAllContacts);
 router.put('/settings/:key', adminController.updateSetting);
 
 module.exports = router;
