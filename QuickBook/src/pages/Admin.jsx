@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Package, BookOpen, Plus, Edit2, Trash2,
   Loader2, X, CheckCircle2, XCircle, AlertCircle, TrendingUp,
-  Users, IndianRupee, Star, Settings
+  Users, IndianRupee, Star, Settings, MessageSquare
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
@@ -101,9 +101,15 @@ const TourFormModal = ({ tour, onClose, onSave }) => {
             {field('Tour Title', 'title', 'text', 'e.g. Goa Beach Escape')}
             {field('Location', 'location', 'text', 'e.g. Goa, India')}
             {field('Duration', 'duration', 'text', 'e.g. 5 Days / 4 Nights')}
-            {field('Price (₹ per person)', 'price', 'number', '15000')}
-            {field('Rating', 'rating', 'number', '4.5')}
-            {field('Number of Reviews', 'reviews', 'number', '0')}
+            <div className="col-span-2 grid grid-cols-2 gap-4">
+              {field('Price (₹ per person)', 'price', 'number', '15000')}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Rating & Reviews</label>
+                <div className="w-full px-3 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-gray-500 text-sm">
+                  {form.rating} ⭐ ({form.reviews} reviews) - Auto-calculated
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>
@@ -193,6 +199,7 @@ export const Admin = () => {
   const [tab, setTab] = useState('stats');
   const [tours, setTours] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [contacts, setContacts] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingTour, setEditingTour] = useState(null);
@@ -204,15 +211,17 @@ export const Admin = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [statsRes, toursRes, bookingsRes, heroRes] = await Promise.all([
+      const [statsRes, toursRes, bookingsRes, contactsRes, heroRes] = await Promise.all([
         apiFetch('/admin/stats', getToken),
         apiFetch('/admin/tours', getToken),
         apiFetch('/admin/bookings', getToken),
+        apiFetch('/admin/contacts', getToken),
         fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000/api'}/settings/heroImage`).then(res => res.ok ? res.json() : null),
       ]);
       setStats(statsRes.data);
       setTours(toursRes.data.tours);
       setBookings(bookingsRes.data.bookings);
+      setContacts(contactsRes.data.contacts);
       if (heroRes?.data?.value) setHeroImagePreview(heroRes.data.value);
     } catch (err) {
       toast.error('Failed to load admin data: ' + err.message);
@@ -300,6 +309,7 @@ export const Admin = () => {
     { id: 'stats',    label: 'Dashboard',  icon: LayoutDashboard },
     { id: 'tours',    label: 'Tours',       icon: Package },
     { id: 'bookings', label: 'Bookings',    icon: BookOpen },
+    { id: 'contacts', label: 'Contacts',    icon: MessageSquare },
     { id: 'settings', label: 'Settings',    icon: Settings },
   ];
 
@@ -485,6 +495,38 @@ export const Admin = () => {
                                 <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${statusColor[b.status] || 'bg-gray-100'}`}>
                                   {b.status}
                                 </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ── CONTACTS TAB ── */}
+              {tab === 'contacts' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <p className="text-sm text-gray-500 mb-4">{contacts.length} total messages</p>
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-gray-50 border-b border-gray-100">
+                            {['Name', 'Email', 'Message', 'Date'].map(h => (
+                              <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                          {contacts.map(c => (
+                            <tr key={c._id} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-4 py-3 font-medium text-gray-900">{c.firstName} {c.lastName}</td>
+                              <td className="px-4 py-3 text-gray-600">{c.email}</td>
+                              <td className="px-4 py-3 text-gray-700 max-w-md truncate" title={c.message}>{c.message}</td>
+                              <td className="px-4 py-3 text-gray-600">
+                                {new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                               </td>
                             </tr>
                           ))}
