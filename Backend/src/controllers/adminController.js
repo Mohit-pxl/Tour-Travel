@@ -7,6 +7,7 @@ const { validationResult } = require('express-validator');
 const Tour = require('../models/Tour');
 const Booking = require('../models/Booking');
 const Setting = require('../models/Setting');
+const Contact = require('../models/Contact');
 const logger = require('../config/logger');
 
 // ── POST /api/admin/upload ────────────────────────────────────────────────────
@@ -154,3 +155,30 @@ exports.getAllBookings = async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Could not fetch bookings' });
   }
 };
+
+// ── GET /api/admin/contacts ───────────────────────────────────────────────────
+exports.getAllContacts = async (req, res) => {
+  try {
+    const page  = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip  = (page - 1) * limit;
+
+    const [contacts, total] = await Promise.all([
+      Contact.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Contact.countDocuments(),
+    ]);
+
+    res.json({
+      status: 'success',
+      results: contacts.length,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      data: { contacts },
+    });
+  } catch (error) {
+    logger.error('Admin contacts error: ' + error.message);
+    res.status(500).json({ status: 'error', message: 'Could not fetch contacts' });
+  }
+};
+
