@@ -93,6 +93,26 @@ export const BookingForm = ({ tour }) => {
     }
   };
 
+  if (!user) {
+    return (
+      <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 sticky top-28 text-center">
+        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <AlertCircle size={32} className="text-blue-500" />
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Sign in to Book</h3>
+        <p className="text-gray-500 text-sm mb-6">
+          You need to be logged in to book this tour.
+        </p>
+        <button
+          onClick={() => navigate('/sign-in')}
+          className="w-full bg-blue-600 text-white font-medium py-3 rounded-xl hover:bg-blue-700 transition-colors text-sm"
+        >
+          Sign In / Create Account
+        </button>
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 sticky top-28 text-center">

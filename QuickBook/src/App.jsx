@@ -57,33 +57,33 @@ function App() {
             }
           />
 
-          {/* ── Protected App Routes ─────────────────────────────────────── */}
+          {/* ── Main App Layout ─────────────────────────────────────── */}
           <Route
             element={
               <>
-                <SignedIn>
-                  <Navbar />
-                  <div className="flex-1 relative z-10">
-                    <Outlet />
-                  </div>
-                  <Footer />
-                </SignedIn>
-
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
+                <Navbar />
+                <div className="flex-1 relative z-10">
+                  <Outlet />
+                </div>
+                <Footer />
               </>
             }
           >
+            {/* Public Routes */}
             <Route path="/"            element={<Home />} />
             <Route path="/tours"        element={<Tours />} />
             <Route path="/tours/:id"    element={<TourDetails />} />
             <Route path="/about"        element={<About />} />
-            <Route path="/contact"      element={<Contact />} />
-            <Route path="/dashboard"    element={<Dashboard />} />
-            <Route path="/wishlist"     element={<Wishlist />} />
-            <Route path="/profile"      element={<Profile />} />
-            <Route path="/admin"        element={<Admin />} />
+
+            {/* Protected Routes */}
+            <Route element={<><SignedIn><Outlet /></SignedIn><SignedOut><RedirectToSignIn /></SignedOut></>}>
+              <Route path="/contact"      element={<Contact />} />
+              <Route path="/dashboard"    element={<Dashboard />} />
+              <Route path="/wishlist"     element={<Wishlist />} />
+              <Route path="/profile"      element={<Profile />} />
+              <Route path="/admin"        element={<Admin />} />
+            </Route>
+
             <Route path="*"             element={<NotFound />} />
           </Route>
         </Routes>
