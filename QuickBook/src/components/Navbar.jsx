@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router';
 import { Menu, X, Plane, ChevronDown, Heart, LayoutDashboard, User as UserIcon, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserButton, useUser } from '@clerk/clerk-react';
+import { UserButton, useUser, SignedIn, SignedOut } from '@clerk/clerk-react';
 import { useTours } from '../context/ToursContext';
 import { useWishlist } from '../context/WishlistContext';
 
@@ -119,46 +119,55 @@ export const Navbar = () => {
             ))}
             
             <div className={`pl-4 ml-2 border-l ${isScrolled ? 'border-gray-200' : 'border-gray-300'} transition-colors duration-300 flex items-center gap-3`}>
-              {/* Wishlist Heart Button */}
-              <NavLink
-                to="/wishlist"
-                className="relative p-2 rounded-full transition-colors hover:bg-gray-100"
-                title="My Wishlist"
-              >
-                <Heart size={20} className="text-black" />
-                {wishlist.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                    {wishlist.length > 9 ? '9+' : wishlist.length}
-                  </span>
-                )}
-              </NavLink>
-
-              {/* Dashboard Link */}
-              <NavLink
-                to="/dashboard"
-                title="My Bookings"
-                className="p-2 rounded-full transition-colors hover:bg-gray-100"
-              >
-                <LayoutDashboard size={20} className="text-black" />
-              </NavLink>
-
-              {/* Admin Panel Link */}
-              {isAdmin && (
+              <SignedIn>
+                {/* Wishlist Heart Button */}
                 <NavLink
-                  to="/admin"
-                  title="Admin Panel"
+                  to="/wishlist"
+                  className="relative p-2 rounded-full transition-colors hover:bg-gray-100"
+                  title="My Wishlist"
+                >
+                  <Heart size={20} className="text-black" />
+                  {wishlist.length > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {wishlist.length > 9 ? '9+' : wishlist.length}
+                    </span>
+                  )}
+                </NavLink>
+
+                {/* Dashboard Link */}
+                <NavLink
+                  to="/dashboard"
+                  title="My Bookings"
                   className="p-2 rounded-full transition-colors hover:bg-gray-100"
                 >
-                  <ShieldAlert size={20} className="text-blue-600" />
+                  <LayoutDashboard size={20} className="text-black" />
                 </NavLink>
-              )}
 
-              {/* Clerk UserButton */}
-              <UserButton
-                appearance={{ elements: { avatarBox: 'w-9 h-9' } }}
-                userProfileUrl="/profile"
-              />
-              <button onClick={() => navigate('/tours')} className="px-6 py-2.5 rounded-full font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 bg-black text-white hover:bg-gray-900">
+                {/* Admin Panel Link */}
+                {isAdmin && (
+                  <NavLink
+                    to="/admin"
+                    title="Admin Panel"
+                    className="p-2 rounded-full transition-colors hover:bg-gray-100"
+                  >
+                    <ShieldAlert size={20} className="text-blue-600" />
+                  </NavLink>
+                )}
+
+                {/* Clerk UserButton */}
+                <UserButton
+                  appearance={{ elements: { avatarBox: 'w-9 h-9' } }}
+                  userProfileUrl="/profile"
+                />
+              </SignedIn>
+
+              <SignedOut>
+                <NavLink to="/sign-in" className="text-sm font-medium text-gray-700 hover:text-blue-600 mr-2">
+                  Sign In
+                </NavLink>
+              </SignedOut>
+
+              <button onClick={() => user ? navigate('/tours') : navigate('/sign-in')} className="px-6 py-2.5 rounded-full font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 bg-black text-white hover:bg-gray-900">
                 Plan a Trip
               </button>
             </div>
@@ -209,39 +218,48 @@ export const Navbar = () => {
               ))}
             </div>
             <div className="pb-12 space-y-4">
-               <div className="flex items-center gap-3 px-2 py-3 bg-gray-50 rounded-xl">
-                 <UserButton appearance={{ elements: { avatarBox: 'w-10 h-10' } }} />
-                 <span className="text-sm text-gray-600 font-medium">My Account</span>
-               </div>
-               <NavLink
-                 to="/dashboard"
-                 onClick={() => setMobileMenuOpen(false)}
-                 className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-               >
-                 <LayoutDashboard size={18} className="text-blue-600" />
-                 <span className="text-sm font-medium text-gray-700">My Bookings</span>
-               </NavLink>
-               
-               {isAdmin && (
+               <SignedIn>
+                 <div className="flex items-center gap-3 px-2 py-3 bg-gray-50 rounded-xl">
+                   <UserButton appearance={{ elements: { avatarBox: 'w-10 h-10' } }} />
+                   <span className="text-sm text-gray-600 font-medium">My Account</span>
+                 </div>
                  <NavLink
-                   to="/admin"
+                   to="/dashboard"
                    onClick={() => setMobileMenuOpen(false)}
-                   className="flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition-colors"
+                   className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
                  >
-                   <ShieldAlert size={18} className="text-blue-600" />
-                   <span className="text-sm font-medium text-blue-700">Admin Panel</span>
+                   <LayoutDashboard size={18} className="text-blue-600" />
+                   <span className="text-sm font-medium text-gray-700">My Bookings</span>
                  </NavLink>
-               )}
+                 
+                 {isAdmin && (
+                   <NavLink
+                     to="/admin"
+                     onClick={() => setMobileMenuOpen(false)}
+                     className="flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition-colors"
+                   >
+                     <ShieldAlert size={18} className="text-blue-600" />
+                     <span className="text-sm font-medium text-blue-700">Admin Panel</span>
+                   </NavLink>
+                 )}
 
-               <NavLink
-                 to="/wishlist"
-                 onClick={() => setMobileMenuOpen(false)}
-                 className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-               >
-                 <Heart size={18} className="text-red-500 fill-red-500" />
-                 <span className="text-sm font-medium text-gray-700">Wishlist {wishlist.length > 0 && `(${wishlist.length})`}</span>
-               </NavLink>
-               <button onClick={() => { setMobileMenuOpen(false); navigate('/tours'); }} className="w-full bg-black text-white px-6 py-4 rounded-xl font-medium text-lg shadow-xl hover:bg-gray-900 transition-colors">
+                 <NavLink
+                   to="/wishlist"
+                   onClick={() => setMobileMenuOpen(false)}
+                   className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                 >
+                   <Heart size={18} className="text-red-500 fill-red-500" />
+                   <span className="text-sm font-medium text-gray-700">Wishlist {wishlist.length > 0 && `(${wishlist.length})`}</span>
+                 </NavLink>
+               </SignedIn>
+
+               <SignedOut>
+                 <NavLink to="/sign-in" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 bg-gray-50 text-center rounded-xl font-medium text-gray-700">
+                   Sign In
+                 </NavLink>
+               </SignedOut>
+
+               <button onClick={() => { setMobileMenuOpen(false); user ? navigate('/tours') : navigate('/sign-in'); }} className="w-full bg-black text-white px-6 py-4 rounded-xl font-medium text-lg shadow-xl hover:bg-gray-900 transition-colors">
                  Plan Your Journey
                </button>
             </div>
