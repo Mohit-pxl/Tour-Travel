@@ -1,9 +1,49 @@
-import { useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { testimonials } from '../data/mockData';
 import { Quote } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+
 export const Testimonials = () => {
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const res = await fetch(`${API_URL}/reviews?limit=4`);
+        const data = await res.json();
+        if (data.data?.reviews) {
+          const mappedReviews = data.data.reviews.map(review => ({
+            id: review._id,
+            content: review.comment,
+            name: review.userName,
+            avatar: review.userAvatar || `https://ui-avatars.com/api/?name=${review.userName}&background=3b82f6&color=fff&size=64`,
+            role: 'Traveler'
+          }));
+          setTestimonials(mappedReviews);
+        }
+      } catch (error) {
+        console.error('Error fetching testimonials:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTestimonials();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-20 bg-transparent relative overflow-hidden flex items-center justify-center min-h-[500px]">
+         <div className="animate-spin w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) {
+    return null;
+  }
+
   return (
     <section className="py-20 bg-transparent relative overflow-hidden">
       {/* Map Background (Abstract Representation) */}

@@ -18,6 +18,9 @@ const validateReview = [
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 
+// GET /api/reviews
+router.get('/', reviewController.getAllRecentReviews);
+
 // GET /api/reviews/:tourId
 router.get('/:tourId', reviewController.getReviewsByTour);
 
