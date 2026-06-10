@@ -9,6 +9,18 @@ const Review = require('../models/Review');
 const Tour = require('../models/Tour');
 const logger = require('../config/logger');
 
+// ── GET /api/reviews ──────────────────────────────────────────────────────────
+exports.getAllRecentReviews = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const reviews = await Review.find().sort({ createdAt: -1 }).limit(limit);
+    res.json({ status: 'success', results: reviews.length, data: { reviews } });
+  } catch (error) {
+    logger.error('Error fetching recent reviews: ' + error.message);
+    res.status(500).json({ status: 'error', message: 'Could not fetch reviews' });
+  }
+};
+
 // ── GET /api/reviews/:tourId ──────────────────────────────────────────────────
 exports.getReviewsByTour = async (req, res) => {
   try {
